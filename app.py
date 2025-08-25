@@ -26,12 +26,14 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
+# Import Google Fonts first (critical for Streamlit Cloud)
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap" rel="stylesheet">
+""", unsafe_allow_html=True)
+
 # Custom CSS for stunning Instagram-themed UI
 st.markdown("""
 <style>
-/* Import Poppins font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 /* Main App Styling */
 .stApp {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
@@ -208,7 +210,7 @@ try:
     st.markdown(f"""
     <div class="header-container">
         <img src="data:image/png;base64,{img_base64}" class="instagram-logo" alt="Instagram Logo">
-        <h1 class="animated-title">Instagram Profile Analyzer Aditya</h1>
+        <h1 class="animated-title">Instagram Profile Analyzer</h1>
     </div>
     """, unsafe_allow_html=True)
     
@@ -220,6 +222,7 @@ except FileNotFoundError:
         <h1 class="animated-title">Instagram Profile Analyzer</h1>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 # Session state initialization
@@ -251,7 +254,6 @@ with col1:
     )
 
 with col2:
-    # REMOVED: st.markdown("<br>", unsafe_allow_html=True)
     analyze_btn = st.button(
         "🚀 Analyze Profile", 
         type="primary", 
