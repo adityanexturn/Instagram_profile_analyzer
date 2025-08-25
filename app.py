@@ -27,7 +27,7 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-# Custom CSS for stunning Instagram-themed UI (with corrected font import)
+# Custom CSS for stunning Instagram-themed UI
 st.markdown("""
 <style>
 /* Import Google Font (Correct Method) */
@@ -72,9 +72,11 @@ st.markdown("""
 
 /* Animated Instagram Gradient Title */
 .animated-title {
+    color: #FD1D1D; /* <-- The added fallback color */
     font-family: 'Poppins', sans-serif;
-    font-size: 4rem;
+    font-size: 3.8rem;
     font-weight: 900;
+    white-space: nowrap;
     background: linear-gradient(
         45deg,
         #833AB4 0%,
@@ -132,15 +134,6 @@ st.markdown("""
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Status Container Styling */
-.status-container {
-    background: linear-gradient(135deg, rgba(131, 58, 180, 0.2), rgba(253, 29, 29, 0.2));
-    border-radius: 15px;
-    padding: 1.5rem;
-    border: 1px solid rgba(131, 58, 180, 0.4);
-    margin: 1rem 0;
-}
-
 /* Enhanced Info Boxes */
 .stAlert {
     background: linear-gradient(135deg, rgba(131, 58, 180, 0.15), rgba(253, 29, 29, 0.15));
@@ -187,15 +180,6 @@ header {visibility: hidden;}
     background: linear-gradient(45deg, #833AB4, #FD1D1D);
     border-radius: 4px;
 }
-
-/* Subtitle styling */
-.subtitle {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #cccccc;
-    margin-bottom: 2rem;
-    font-style: italic;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -220,8 +204,6 @@ except FileNotFoundError:
         <h1 class="animated-title">Instagram Profile Analyzer</h1>
     </div>
     """, unsafe_allow_html=True)
-
-
 
 # Session state initialization
 if "profile_data" not in st.session_state:
@@ -269,13 +251,13 @@ if analyze_btn and username:
             status.write("🔍 Scraping profile data...")
             profile_data = get_instagram_profile_data(username.strip())
             
-            if not profile_data["success"]:
+            if not profile_data.get("success"):
                 status.update(label="Analysis Failed!", state="error")
-                st.error(f"❌ Failed to fetch profile: {profile_data['error']}")
+                st.error(f"❌ Failed to fetch profile: {profile_data.get('error', 'Unknown error')}")
                 st.session_state.is_analyzing = False
                 st.stop()
             
-            if profile_data["profile"].get("is_private"):
+            if profile_data.get("profile", {}).get("is_private"):
                 status.update(label="Analysis Failed!", state="error")
                 st.error("🔒 This profile is private. Please provide a public profile.")
                 st.session_state.is_analyzing = False
@@ -288,9 +270,9 @@ if analyze_btn and username:
             status.write("🧠 Generating AI insights...")
             ai_analysis = analyze_instagram_profile(profile_data)
             
-            if not ai_analysis["success"]:
+            if not ai_analysis.get("success"):
                 status.update(label="Analysis Failed!", state="error")
-                st.error(f"❌ AI analysis failed: {ai_analysis['error']}")
+                st.error(f"❌ AI analysis failed: {ai_analysis.get('error', 'Unknown error')}")
                 st.session_state.is_analyzing = False
                 st.stop()
             
@@ -310,14 +292,14 @@ if analyze_btn and username:
 if st.session_state.profile_data and st.session_state.ai_analysis:
     profile_data = st.session_state.profile_data
     ai_analysis = st.session_state.ai_analysis
-    profile = profile_data["profile"]
+    profile = profile_data.get("profile", {})
     
     st.markdown("---")
     
     # Profile Header
     st.markdown(f"## 👤 @{profile.get('username')} • {profile.get('full_name') or ''}")
     if profile.get('biography'):
-        st.markdown(f"*{profile['biography']}*")
+        st.markdown(f"*{profile.get('biography')}*")
     
     # Main Metrics (Top Row)
     m_col1, m_col2, m_col3 = st.columns(3)
@@ -371,7 +353,7 @@ if st.session_state.profile_data and st.session_state.ai_analysis:
     # Enhanced Engagement Chart
     st.markdown("### 📊 Engagement Analysis")
     
-    if profile_data["recent_posts"]:
+    if profile_data.get("recent_posts"):
         posts = profile_data["recent_posts"]
         total_likes = sum(post.get("likes", 0) for post in posts)
         total_comments = sum(post.get("comments_count", 0) for post in posts)
@@ -404,7 +386,7 @@ if st.session_state.profile_data and st.session_state.ai_analysis:
     viz_data = create_profile_visualizations(profile_data, ai_analysis)
     
     if viz_data.get("success"):
-        charts = viz_data["charts"]
+        charts = viz_data.get("charts", {})
         
         v_col1, v_col2 = st.columns(2)
         
