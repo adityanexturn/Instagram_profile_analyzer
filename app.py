@@ -72,8 +72,8 @@ st.markdown("""
 
 /* Animated Instagram Gradient Title */
 .animated-title {
-    color: #FD1D1D; /* <-- The added fallback color */
-    font-family: 'Poppins', sans-serif;
+    color: #FD1D1D !important; /* <-- FORCED FALLBACK COLOR */
+    font-family: 'Poppins', sans-serif !important; /* <-- FORCED FONT */
     font-size: 3.8rem;
     font-weight: 900;
     white-space: nowrap;
