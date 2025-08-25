@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 
 # Page configuration
 st.set_page_config(
-    page_title="Instagram Profile Analyzer Aditya",
+    page_title="Instagram Profile Analyzer",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -208,7 +208,7 @@ try:
     st.markdown(f"""
     <div class="header-container">
         <img src="data:image/png;base64,{img_base64}" class="instagram-logo" alt="Instagram Logo">
-        <h1 class="animated-title">Instagram Profile Analyzer</h1>
+        <h1 class="animated-title">Instagram Profile Analyzer Aditya</h1>
     </div>
     """, unsafe_allow_html=True)
     
