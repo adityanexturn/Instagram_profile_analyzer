@@ -29,6 +29,9 @@ def get_base64_of_bin_file(bin_file):
 # Custom CSS for stunning Instagram-themed UI
 st.markdown("""
 <style>
+/* Import Poppins font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 /* Main App Styling */
 .stApp {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
@@ -68,6 +71,7 @@ st.markdown("""
 
 /* Animated Instagram Gradient Title */
 .animated-title {
+    font-family: 'Poppins', sans-serif;
     font-size: 4rem;
     font-weight: 900;
     background: linear-gradient(
@@ -85,6 +89,7 @@ st.markdown("""
     animation: gradientFlow 4s ease-in-out infinite;
     letter-spacing: 2px;
     margin: 0;
+    text-transform: uppercase;
 }
 
 @keyframes gradientFlow {
@@ -100,7 +105,7 @@ st.markdown("""
     border-radius: 25px;
     padding: 0.5rem 2rem;
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(131, 58, 180, 0.4);
 }
@@ -212,7 +217,7 @@ except FileNotFoundError:
     st.markdown("""
     <div class="header-container">
         <div style="width: 100px; height: 100px; margin-right: 30px; background: linear-gradient(45deg, #833AB4, #FD1D1D, #FCB045); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; animation: pulse 2s ease-in-out infinite;">📷</div>
-        <h1 class="animated-title">INSTAGRAM PROFILE ANALYZER</h1>
+        <h1 class="animated-title">Instagram Profile Analyzer</h1>
     </div>
     """, unsafe_allow_html=True)
 
@@ -246,7 +251,7 @@ with col1:
     )
 
 with col2:
-    st.markdown("<br>", unsafe_allow_html=True)
+    # REMOVED: st.markdown("<br>", unsafe_allow_html=True)
     analyze_btn = st.button(
         "🚀 Analyze Profile", 
         type="primary", 
