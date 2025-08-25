@@ -67,7 +67,7 @@ st.markdown("""
 
 /* Animated Instagram Gradient Title */
 .animated-title {
-    font-size: 6rem;
+    font-size: 4rem;
     font-weight: 900;
     background: linear-gradient(
         45deg,
