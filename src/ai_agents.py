@@ -52,7 +52,7 @@ Video Ratio: {stats['video_ratio']:.2f}
 
 Based on the provided data, return a single JSON object with this schema:
 {{
-  "summary": "A concise 3-4 sentence overview of the profile's purpose, content style, and audience.",
+  "summary": "A concise 4-5 sentence overview of the profile's purpose, content style, and audience.",
   "insights": {{
     "content_strategy": "Analyze primary content themes, formats (photo/video), and overall strategy. Estimate posting frequency if possible.",
     "audience_engagement": "Evaluate audience interaction based on likes, comments, and the nature of captions.",
