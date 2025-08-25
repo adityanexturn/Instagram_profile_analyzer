@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 
 # Page configuration
 st.set_page_config(
-    page_title="Instagram Profile Analyzer",
+    page_title="Instagram Profile Analyzer Aditya",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="collapsed",
