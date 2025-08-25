@@ -3,6 +3,8 @@ import sys
 import os
 import time
 import base64
+import pandas as pd
+import plotly.graph_objects as go
 
 # Ensure we can import local src modules
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
@@ -10,7 +12,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from data_handler import get_instagram_profile_data
 from ai_agents import configure_gemini, analyze_instagram_profile
 from visualization import create_profile_visualizations
-import plotly.graph_objects as go
 
 # Page configuration
 st.set_page_config(
@@ -26,14 +27,12 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-# Import Google Fonts first (critical for Streamlit Cloud)
-st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap" rel="stylesheet">
-""", unsafe_allow_html=True)
-
-# Custom CSS for stunning Instagram-themed UI
+# Custom CSS for stunning Instagram-themed UI (with corrected font import)
 st.markdown("""
 <style>
+/* Import Google Font (Correct Method) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+
 /* Main App Styling */
 .stApp {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
@@ -91,7 +90,6 @@ st.markdown("""
     animation: gradientFlow 4s ease-in-out infinite;
     letter-spacing: 2px;
     margin: 0;
-    text-transform: uppercase;
 }
 
 @keyframes gradientFlow {
@@ -262,54 +260,54 @@ with col2:
     )
 
 # Enhanced Analysis Process with Status Updates
-if analyze_btn and username and not st.session_state.is_analyzing:
+if analyze_btn and username:
     if username.strip():
         st.session_state.is_analyzing = True
         
-        # Create status container
-        status_container = st.status("🔍 Starting analysis...", expanded=True)
-        
-        with status_container:
+        with st.status("🔍 Starting analysis...", expanded=True) as status:
             # Step 1: Data Scraping
-            st.write("🔍 Scraping profile data...")
+            status.write("🔍 Scraping profile data...")
             profile_data = get_instagram_profile_data(username.strip())
             
             if not profile_data["success"]:
+                status.update(label="Analysis Failed!", state="error")
                 st.error(f"❌ Failed to fetch profile: {profile_data['error']}")
                 st.session_state.is_analyzing = False
                 st.stop()
             
             if profile_data["profile"].get("is_private"):
+                status.update(label="Analysis Failed!", state="error")
                 st.error("🔒 This profile is private. Please provide a public profile.")
                 st.session_state.is_analyzing = False
                 st.stop()
             
             st.session_state.profile_data = profile_data
-            st.write("✅ Profile data collected successfully!")
+            status.write("✅ Profile data collected successfully!")
             
             # Step 2: AI Analysis
-            st.write("🧠 Generating AI insights...")
+            status.write("🧠 Generating AI insights...")
             ai_analysis = analyze_instagram_profile(profile_data)
             
             if not ai_analysis["success"]:
+                status.update(label="Analysis Failed!", state="error")
                 st.error(f"❌ AI analysis failed: {ai_analysis['error']}")
                 st.session_state.is_analyzing = False
                 st.stop()
             
             st.session_state.ai_analysis = ai_analysis
-            st.write("✅ AI analysis completed!")
+            status.write("✅ AI analysis completed!")
             
             # Step 3: Visualization
-            st.write("📊 Creating visualizations...")
+            status.write("📊 Creating visualizations...")
             time.sleep(0.5)  # Brief pause for effect
-            st.write("✅ All done!")
+            status.write("✅ All done!")
+            
+            status.update(label="🎉 Analysis Complete!", state="complete", expanded=False)
         
-        status_container.update(label="🎉 Analysis Complete!", state="complete")
         st.session_state.is_analyzing = False
-        st.rerun()
 
 # Display Results
-if st.session_state.profile_data and st.session_state.ai_analysis and not st.session_state.is_analyzing:
+if st.session_state.profile_data and st.session_state.ai_analysis:
     profile_data = st.session_state.profile_data
     ai_analysis = st.session_state.ai_analysis
     profile = profile_data["profile"]
@@ -322,23 +320,23 @@ if st.session_state.profile_data and st.session_state.ai_analysis and not st.ses
         st.markdown(f"*{profile['biography']}*")
     
     # Main Metrics (Top Row)
-    col1, col2, col3 = st.columns(3)
+    m_col1, m_col2, m_col3 = st.columns(3)
     
-    with col1:
+    with m_col1:
         st.metric(
             "👥 Followers", 
             f"{profile.get('followers', 0):,}",
             help="Total number of followers"
         )
     
-    with col2:
+    with m_col2:
         st.metric(
             "📝 Posts", 
             f"{profile.get('posts_count', 0):,}",
             help="Total posts published"
         )
     
-    with col3:
+    with m_col3:
         st.metric(
             "➡️ Following", 
             f"{profile.get('following', 0):,}",
@@ -408,41 +406,20 @@ if st.session_state.profile_data and st.session_state.ai_analysis and not st.ses
     if viz_data.get("success"):
         charts = viz_data["charts"]
         
-        col1, col2 = st.columns(2)
+        v_col1, v_col2 = st.columns(2)
         
-        with col1:
+        with v_col1:
             if "post_performance" in charts:
-                chart = charts["post_performance"]
-                chart.update_layout(
-                    template="plotly_dark",
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font=dict(color='white')
-                )
-                st.plotly_chart(chart, use_container_width=True)
+                st.plotly_chart(charts["post_performance"], use_container_width=True)
             
             if "content_distribution" in charts:
-                chart = charts["content_distribution"]
-                chart.update_layout(
-                    template="plotly_dark",
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font=dict(color='white')
-                )
-                st.plotly_chart(chart, use_container_width=True)
+                st.plotly_chart(charts["content_distribution"], use_container_width=True)
         
-        with col2:
+        with v_col2:
             if "profile_stats" in charts:
-                chart = charts["profile_stats"]
-                chart.update_layout(
-                    template="plotly_dark",
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font=dict(color='white')
-                )
-                st.plotly_chart(chart, use_container_width=True)
+                st.plotly_chart(charts["profile_stats"], use_container_width=True)
     
-    # Enhanced Posts Table (WITHOUT LINKS)
+    # Enhanced Posts Table
     if profile_data.get("recent_posts"):
         st.markdown("### 📱 Recent Posts Analysis")
         
@@ -456,7 +433,6 @@ if st.session_state.profile_data and st.session_state.ai_analysis and not st.ses
                 "Caption Preview": (post.get("caption") or "No caption")[:100] + ("..." if len(post.get("caption", "")) > 100 else "")
             })
         
-        import pandas as pd
         df = pd.DataFrame(posts_data)
         
         st.dataframe(df, use_container_width=True)

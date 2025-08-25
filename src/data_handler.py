@@ -1,10 +1,8 @@
+import streamlit as st
 import instaloader
 from datetime import datetime
 from typing import Dict, Any, List
 import time
-
-# Simple in-memory cache for this process
-_PROFILE_CACHE: Dict[str, Dict[str, Any]] = {}
 
 def _preprocess_posts(posts: List[Dict[str, Any]], max_posts: int = 8, caption_limit: int = 200) -> List[Dict[str, Any]]:
     """Limit post count and truncate captions to reduce LLM token usage."""
@@ -22,20 +20,12 @@ def _preprocess_posts(posts: List[Dict[str, Any]], max_posts: int = 8, caption_l
         })
     return processed
 
+@st.cache_data(ttl=3600)
 def get_instagram_profile_data(username: str) -> Dict[str, Any]:
     """
-    Scrapes Instagram profile data using instaloader with error handling and simple cache.
+    Scrapes Instagram profile data using instaloader with error handling and Streamlit's cache.
     Returns a dictionary with profile information and recent posts (preprocessed).
     """
-    # Serve from cache if available
-    if username in _PROFILE_CACHE:
-        cached = _PROFILE_CACHE[username]
-        return {
-            **cached,
-            "from_cache": True,
-            "scrape_timestamp": datetime.now().isoformat(),
-        }
-
     try:
         loader = instaloader.Instaloader()
         loader.context.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -81,8 +71,8 @@ def get_instagram_profile_data(username: str) -> Dict[str, Any]:
                 })
                 count += 1
                 time.sleep(0.5)
-        except Exception as post_error:
-            # Continue with what we have
+        except Exception:
+            # Continue with what we have, even if post scraping is interrupted
             pass
 
         # Preprocess for LLM cost/latency
@@ -94,11 +84,7 @@ def get_instagram_profile_data(username: str) -> Dict[str, Any]:
             "scrape_timestamp": datetime.now().isoformat(),
             "success": True,
             "error": None,
-            "from_cache": False,
         }
-
-        # Cache it
-        _PROFILE_CACHE[username] = result
         return result
 
     except Exception as e:

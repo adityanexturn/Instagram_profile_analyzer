@@ -1,5 +1,6 @@
+import streamlit as st
 import google.generativeai as genai
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 import json
 
 def configure_gemini(api_key: str):
@@ -21,7 +22,6 @@ def _aggregate_post_stats(posts: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 def create_structured_prompt(profile: Dict[str, Any], posts: List[Dict[str, Any]]) -> str:
     stats = _aggregate_post_stats(posts)
-    # Build post samples as lightweight XML-like tags
     post_samples = "".join(
         f"<post><caption_preview>{(p.get('caption') or '').replace('<',' ').replace('>',' ')}</caption_preview></post>"
         for p in posts
@@ -52,7 +52,7 @@ Video Ratio: {stats['video_ratio']:.2f}
 
 Based on the provided data, return a single JSON object with this schema:
 {{
-  "summary": "A concise 4-5 sentence overview of the profile's purpose, content style, and audience.",
+  "summary": "A concise 7-8 sentence overview of the profile's purpose, content style, and audience. give a good detail",
   "insights": {{
     "content_strategy": "Analyze primary content themes, formats (photo/video), and overall strategy. Estimate posting frequency if possible.",
     "audience_engagement": "Evaluate audience interaction based on likes, comments, and the nature of captions.",
@@ -70,19 +70,14 @@ def _strip_markdown_fences(text: str) -> str:
     if t.startswith("```"):
         newline_index = t.find("\n")
         if newline_index != -1:
-            # Strip the opening fence and any optional language identifier line
             t = t[newline_index + 1:]
         else:
-            # Just fences without content
             t = t[3:]
     if t.endswith("```"):
         t = t[:-3]
     return t.strip()
 
 def _validate_and_normalize(parsed: Any) -> Dict[str, Any]:
-    """
-    Ensure required keys exist and types are strings; provide safe fallbacks.
-    """
     result = {"summary": "", "insights": {}}
     if isinstance(parsed, dict):
         summary = parsed.get("summary", "")
@@ -91,7 +86,6 @@ def _validate_and_normalize(parsed: Any) -> Dict[str, Any]:
             summary = str(summary)
         if not isinstance(insights, dict):
             insights = {}
-        # Normalize insight fields
         def s(v): return v if isinstance(v, str) else str(v)
         insights_out = {
             "content_strategy": s(insights.get("content_strategy", "")),
@@ -103,7 +97,6 @@ def _validate_and_normalize(parsed: Any) -> Dict[str, Any]:
         result["summary"] = summary
         result["insights"] = insights_out
     else:
-        # Fallback minimal structure
         result = {
             "summary": "Analysis completed but response format was unexpected.",
             "insights": {
@@ -116,6 +109,7 @@ def _validate_and_normalize(parsed: Any) -> Dict[str, Any]:
         }
     return result
 
+@st.cache_data
 def analyze_instagram_profile(profile_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Analyze Instagram profile data using Gemini with deterministic prompt and safe parsing.
@@ -138,7 +132,6 @@ def analyze_instagram_profile(profile_data: Dict[str, Any]) -> Dict[str, Any]:
         try:
             parsed = json.loads(cleaned)
         except json.JSONDecodeError:
-            # light retry: try to find first/last brace to salvage JSON
             start = cleaned.find("{")
             end = cleaned.rfind("}")
             if start != -1 and end != -1 and end > start:
@@ -163,7 +156,3 @@ def analyze_instagram_profile(profile_data: Dict[str, Any]) -> Dict[str, Any]:
             "summary": "",
             "insights": {},
         }
-
-# Test hook
-if __name__ == "__main__":
-    print("AI agent module ready with structured prompting and safe parsing.")
