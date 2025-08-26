@@ -83,6 +83,7 @@ st.markdown("""
 
 /* Custom Button Styling */
 .stButton > button {
+    margin-top: 28px; /* <-- ADD THIS LINE to align the button */
     background: linear-gradient(45deg, #833AB4, #FD1D1D, #FCB045);
     color: white;
     border: none;
