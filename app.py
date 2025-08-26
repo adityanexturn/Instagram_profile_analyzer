@@ -30,7 +30,7 @@ def get_base64_of_bin_file(bin_file):
 # Custom CSS for stunning Instagram-themed UI
 st.markdown("""
 <style>
-/* Import Google Font (Correct Method) */
+/* Import Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
 
 /* Main App Styling */
@@ -49,7 +49,7 @@ st.markdown("""
     padding: 1rem;
 }
 
-/* Animated Instagram Logo */
+/* Animated Instagram Logo (Unchanged) */
 .instagram-logo {
     width: 100px;
     height: 100px;
@@ -70,33 +70,15 @@ st.markdown("""
     }
 }
 
-/* Animated Instagram Gradient Title */
+/* Simplified Instagram Title */
 .animated-title {
-    color: #FD1D1D !important; /* <-- FORCED FALLBACK COLOR */
-    font-family: 'Poppins', sans-serif !important; /* <-- FORCED FONT */
+    font-family: 'Poppins', sans-serif;
     font-size: 3.8rem;
     font-weight: 900;
+    color: #E1306C; /* Simple, solid Instagram pink color */
     white-space: nowrap;
-    background: linear-gradient(
-        45deg,
-        #833AB4 0%,
-        #FD1D1D 25%,
-        #FCB045 50%,
-        #FFDC80 75%,
-        #833AB4 100%
-    );
-    background-size: 400% 400%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradientFlow 4s ease-in-out infinite;
     letter-spacing: 2px;
     margin: 0;
-}
-
-@keyframes gradientFlow {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
 }
 
 /* Custom Button Styling */
